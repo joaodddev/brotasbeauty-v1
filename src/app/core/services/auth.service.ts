@@ -8,7 +8,7 @@ import { User, Profissional } from '../../shared/models';
 })
 export class AuthService {
     private http = inject(HttpClient);
-    private readonly API_URL = 'http://localhost:4000/api';
+    private readonly API_URL = 'https://brotasbeauty-backend.onrender.com/api';
 
     authToken = signal<string | null>(null);
     currentUser = signal<User | null>(null);
