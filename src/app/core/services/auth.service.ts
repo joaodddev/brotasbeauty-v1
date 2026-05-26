@@ -1,101 +1,112 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { User, Profissional } from '../../shared/models';
-
-const PROFISSIONAIS: Profissional[] = [
-    {
-        id: 'simone',
-        nome: 'Simone',
-        login: 'simone',
-        senha: '123',
-        cargo: 'Profissional',
-        cor: '#c9a18b',
-        comissaoPercentual: 40,
-        servicos: ['Unhas']
-    },
-    {
-        id: 'elizeth',
-        nome: 'Elizeth',
-        login: 'elizeth',
-        senha: '123',
-        cargo: 'Profissional',
-        cor: '#e8aebf',
-        comissaoPercentual: 70,
-        servicos: ['Cabelo']
-    },
-    {
-        id: 'clau',
-        nome: 'Clau',
-        login: 'clau',
-        senha: '123',
-        cargo: 'Profissional',
-        cor: '#8c4a4a',
-        comissaoPercentual: 50,
-        servicos: ['Estética']
-    },
-    {
-        id: 'kaylaine',
-        nome: 'Kaylaine',
-        login: 'kaylaine',
-        senha: '123',
-        cargo: 'Profissional',
-        cor: '#b07a9a',
-        comissaoPercentual: 5,
-        servicos: ['Auxiliar']
-    },
-    {
-        id: 'admin',
-        nome: 'Administradora',
-        login: 'admin',
-        senha: 'admin',
-        cargo: 'Administradora',
-        cor: '#5a7a8c',
-        comissaoPercentual: 0,
-        servicos: []
-    }
-];
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
+    private http = inject(HttpClient);
+    private readonly API_URL = 'http://localhost:4000/api';
+
+    authToken = signal<string | null>(null);
     currentUser = signal<User | null>(null);
     isAuthenticated = signal(false);
+    profissionais = signal<Profissional[]>([]);
 
-    login(username: string, password: string): { success: boolean; message?: string } {
-        const prof = PROFISSIONAIS.find(p => p.login === username && p.senha === password);
+    constructor() {
+        this.loadFromStorage();
+    }
 
-        if (!prof) {
-            return { success: false, message: 'Usuário ou senha incorretos' };
+    private getAuthHeaders(): { headers: HttpHeaders } {
+        const token = this.authToken();
+        return token
+            ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+            : { headers: new HttpHeaders() };
+    }
+
+    private loadFromStorage(): void {
+        const token = localStorage.getItem('bb_token');
+        const userJson = localStorage.getItem('bb_user');
+        if (token && userJson) {
+            try {
+                const user: User = JSON.parse(userJson);
+                this.authToken.set(token);
+                this.currentUser.set(user);
+                this.isAuthenticated.set(true);
+                void this.loadProfissionais();
+            } catch {
+                this.clearSession();
+            }
         }
+    }
 
-        const user: User = {
-            id: prof.id,
-            nome: prof.nome,
-            login: prof.login,
-            cargo: prof.cargo,
-            cor: prof.cor
-        };
+    async login(username: string, password: string): Promise<{ success: boolean; message?: string }> {
+        try {
+            const response = await firstValueFrom(
+                this.http.post<{ token: string; user: User }>(
+                    `${this.API_URL}/auth/login`,
+                    { username, password }
+                )
+            );
 
-        this.currentUser.set(user);
-        this.isAuthenticated.set(true);
+            this.authToken.set(response.token);
+            this.currentUser.set(response.user);
+            this.isAuthenticated.set(true);
+            localStorage.setItem('bb_token', response.token);
+            localStorage.setItem('bb_user', JSON.stringify(response.user));
 
-        return { success: true };
+            await this.loadProfissionais();
+            return { success: true };
+        } catch (error: any) {
+            const message =
+                error?.error?.message ||
+                error?.message ||
+                'Erro ao fazer login. Verifique atendimento de backend.';
+            return { success: false, message };
+        }
     }
 
     logout(): void {
+        this.clearSession();
+    }
+
+    private clearSession(): void {
+        this.authToken.set(null);
         this.currentUser.set(null);
         this.isAuthenticated.set(false);
+        this.profissionais.set([]);
+        localStorage.removeItem('bb_token');
+        localStorage.removeItem('bb_user');
     }
 
-    getProfissionais(): Profissional[] {
-        return PROFISSIONAIS;
-    }
+    async loadProfissionais(): Promise<void> {
+        if (!this.authToken()) {
+            this.profissionais.set([]);
+            return;
+        }
 
-    getProfissionalById(id: string): Profissional | undefined {
-        return PROFISSIONAIS.find(p => p.id === id);
+        try {
+            const profs = await firstValueFrom(
+                this.http.get<Profissional[]>(`${this.API_URL}/profissionais`, this.getAuthHeaders())
+            );
+            this.profissionais.set(profs);
+        } catch (error) {
+            console.error('Erro carregando profissionais', error);
+            this.profissionais.set([]);
+        }
     }
 
     getProfissionaisList(): Profissional[] {
-        return PROFISSIONAIS.filter(p => p.cargo === 'Profissional');
+        return this.profissionais().filter(p => p.cargo === 'Profissional');
+    }
+
+    getProfissionalById(id: string): Profissional | undefined {
+        return this.profissionais().find(p => p.id === id);
+    }
+
+    getToken(): string | null {
+        return this.authToken();
     }
 }

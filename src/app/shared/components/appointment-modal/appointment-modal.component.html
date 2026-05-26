@@ -16,7 +16,7 @@
                 <label>Profissional</label>
                 <ng-container *ngIf="isAdminUser(); else onlyProf">
                     <select [(ngModel)]="profId">
-                        <option *ngFor="let prof of profissionaisList" [value]="prof.id">{{ prof.nome }}</option>
+                        <option *ngFor="let prof of profissionaisList()" [value]="prof.id">{{ prof.nome }}</option>
                     </select>
                 </ng-container>
                 <ng-template #onlyProf>

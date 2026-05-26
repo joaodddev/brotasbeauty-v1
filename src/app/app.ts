@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { Sidebar } from './layout/sidebar/sidebar';
 import { AppointmentModalComponent } from './shared/components/appointment-modal/appointment-modal.component';
 import { AuthService } from './core/services/auth.service';
@@ -8,7 +9,7 @@ import { AuthService } from './core/services/auth.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, Sidebar, AppointmentModalComponent],
+  imports: [RouterOutlet, CommonModule, HttpClientModule, Sidebar, AppointmentModalComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

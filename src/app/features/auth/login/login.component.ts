@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { AppointmentsService } from '../../../core/services/appointments.service';
 
 @Component({
     selector: 'app-login',
@@ -12,17 +13,19 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class LoginComponent {
     private authService = inject(AuthService);
+    private appointmentsService = inject(AppointmentsService);
     private router = inject(Router);
 
     username = signal('');
     password = signal('');
     errorMessage = signal('');
 
-    onLogin(): void {
+    async onLogin(): Promise<void> {
         this.errorMessage.set('');
-        const result = this.authService.login(this.username(), this.password());
+        const result = await this.authService.login(this.username(), this.password());
 
         if (result.success) {
+            await this.appointmentsService.refresh();
             this.router.navigate(['/dashboard']);
         } else {
             this.errorMessage.set(result.message || 'Erro ao fazer login');
@@ -35,7 +38,7 @@ export class LoginComponent {
                 const passwordInput = document.getElementById('login-pass') as HTMLInputElement;
                 passwordInput?.focus();
             } else {
-                this.onLogin();
+                void this.onLogin();
             }
         }
     }

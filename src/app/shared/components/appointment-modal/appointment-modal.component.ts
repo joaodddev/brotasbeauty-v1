@@ -29,7 +29,7 @@ export class AppointmentModalComponent {
     valor = signal(120);
     observations = signal('');
 
-    profissionaisList = this.authService.getProfissionaisList();
+    profissionaisList = this.authService.profissionais;
     currentUser = this.authService.currentUser;
 
     private ALL_SERVICES: string[] = ['Cabelo', 'Unhas', 'Estética', 'Auxiliar', 'Outros'];
@@ -67,7 +67,7 @@ export class AppointmentModalComponent {
             } else if (this.currentUser() && this.currentUser()!.cargo === 'Profissional') {
                 defaultProf = this.currentUser()!.id || '';
             } else {
-                defaultProf = this.profissionaisList[0]?.id || '';
+                defaultProf = this.profissionaisList()[0]?.id || '';
             }
             this.profId.set(defaultProf);
             this.tipoServico.set('Cabelo');
@@ -86,14 +86,14 @@ export class AppointmentModalComponent {
     }
 
     getCurrentCommissionRate(): number {
-        return this.profissionaisList.find(p => p.id === this.profId())?.comissaoPercentual ?? 0;
+        return this.profissionaisList().find(p => p.id === this.profId())?.comissaoPercentual ?? 0;
     }
 
     getServiceOptions(): string[] {
         const user = this.currentUser();
         if (user && user.cargo === 'Administradora') return this.ALL_SERVICES;
 
-        const prof = this.profissionaisList.find(p => p.id === this.profId());
+        const prof = this.profissionaisList().find(p => p.id === this.profId());
         if (prof && prof.servicos && prof.servicos.length) return prof.servicos;
 
         return this.ALL_SERVICES;
@@ -105,14 +105,14 @@ export class AppointmentModalComponent {
     }
 
     getProfNameById(id: string): string {
-        return this.profissionaisList.find(p => p.id === id)?.nome || '';
+        return this.profissionaisList().find(p => p.id === id)?.nome || '';
     }
 
     getEstimatedCommission(): number {
         return +(this.valor() * (this.getCurrentCommissionRate() / 100)).toFixed(2);
     }
 
-    save(): void {
+    async save(): Promise<void> {
         if (!this.clientName().trim()) {
             this.showToast('⚠️ Informe o nome do cliente');
             return;
@@ -141,27 +141,31 @@ export class AppointmentModalComponent {
 
         if (this.modalState().agendamento) {
             // Update
-            this.appointmentsService.updateAgendamento(
+            await this.appointmentsService.updateAgendamento(
                 this.modalState().agendamento!.id,
                 agendamento
             );
             this.showToast('✅ Agendamento atualizado!');
         } else {
             // Create
-            this.appointmentsService.addAgendamento(agendamento);
+            await this.appointmentsService.addAgendamento(agendamento);
             this.showToast('✅ Agendamento criado!');
         }
 
         this.closeModal();
     }
 
-    delete(): void {
+    async delete(): Promise<void> {
         if (!this.modalState().agendamento) return;
 
         const confirmed = confirm('Tem certeza que deseja excluir este agendamento?');
         if (confirmed) {
-            this.appointmentsService.deleteAgendamento(this.modalState().agendamento!.id);
-            this.showToast('🗑️ Agendamento excluído');
+            const success = await this.appointmentsService.deleteAgendamento(this.modalState().agendamento!.id);
+            if (success) {
+                this.showToast('🗑️ Agendamento excluído');
+            } else {
+                this.showToast('⚠️ Erro ao excluir agendamento');
+            }
             this.closeModal();
         }
     }
