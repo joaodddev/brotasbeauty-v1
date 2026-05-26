@@ -1,0 +1,40 @@
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <img src="assets/images/logo.png" alt="Brotas Beauty" class="logo-img" />
+        <div class="sidebar-logo-text">
+            <h2>Brotas Beauty</h2>
+            <p>Sistema Interno</p>
+        </div>
+    </div>
+
+    <div class="sidebar-user" *ngIf="currentUser()">
+        <div class="sidebar-avatar" [style.background]="currentUser()?.cor">
+            {{ getInitials(currentUser()?.nome || '') }}
+        </div>
+        <div class="sidebar-user-info">
+            <div class="name">{{ currentUser()?.nome }}</div>
+            <div class="role">{{ currentUser()?.cargo }}</div>
+        </div>
+    </div>
+
+    <div class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-label">Menu</div>
+            <div class="nav-item active" (click)="navigateTo('dashboard')">
+                <span class="nav-icon">🏠</span><span>Dashboard</span>
+            </div>
+            <div class="nav-item" (click)="navigateTo('agenda')">
+                <span class="nav-icon">📅</span><span>Agenda</span>
+            </div>
+            <div class="nav-item" *ngIf="isAdmin()" (click)="navigateTo('admin')">
+                <span class="nav-icon">⚙️</span><span>Administração</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-bottom">
+        <button class="logout-btn" (click)="logout()">
+            <span>🚪</span><span>Sair</span>
+        </button>
+    </div>
+</div>

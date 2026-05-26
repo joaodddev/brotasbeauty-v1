@@ -1,0 +1,81 @@
+<app-header pageTitle="Olá, {{ userFirstName }} ✨" pageSubtitle="Bem-vinda de volta">
+</app-header>
+
+<div class="page-body">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#fce4ec">📋</div>
+            <div class="stat-value">{{ statToday() }}</div>
+            <div class="stat-label">Hoje</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#e8f5e9">✅</div>
+            <div class="stat-value">{{ statConfirmados() }}</div>
+            <div class="stat-label">Confirmados</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#fff3e0">⏳</div>
+            <div class="stat-value">{{ statPendentes() }}</div>
+            <div class="stat-label">Pendentes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#e3f2fd">📊</div>
+            <div class="stat-value">{{ statSemana() }}</div>
+            <div class="stat-label">Esta semana</div>
+        </div>
+    </div>
+
+    <!-- Cards Row -->
+    <div class="cards-row">
+        <!-- Upcoming Appointments -->
+        <div class="appt-card">
+            <div class="section-title">Próximos atendimentos</div>
+            <div class="appt-list" *ngIf="upcomingAppointments().length > 0; else noAppointments">
+                <div class="appt-item" *ngFor="let appt of upcomingAppointments()" (click)="onEditAppointment(appt.id)">
+                    <div class="appt-time">{{ appt.hora }}</div>
+                    <div class="appt-dot" [style.background]="getProfissionalById(appt.profId)?.cor"></div>
+                    <div class="appt-info">
+                        <div class="client">{{ appt.clienteNome }}</div>
+                        <div class="prof">
+                            {{ getProfissionalById(appt.profId)?.nome }} ·
+                            {{ isToday(appt.data) ? 'Hoje' : formatDate(appt.data) }}
+                        </div>
+                    </div>
+                    <div class="appt-status" [ngClass]="'status-' + appt.status">{{ appt.status }}</div>
+                </div>
+            </div>
+            <ng-template #noAppointments>
+                <p style="text-align:center;color:#9a7a7a;font-size:13px;padding:20px">
+                    Nenhum atendimento próximo
+                </p>
+            </ng-template>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="appt-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                <div class="section-title" style="margin:0">Ação rápida</div>
+            </div>
+            <button class="add-btn" style="width:100%;justify-content:center;margin-bottom:10px"
+                (click)="onNewAppointment()">
+                + Novo Agendamento
+            </button>
+            <div style="display:flex;flex-direction:column;gap:8px">
+                <div *ngFor="let prof of professionalsToday()"
+                    style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--cinza-claro);border-radius:10px;border:1px solid var(--cinza-medio)">
+                    <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0"
+                        [style.background]="prof.cor">
+                        {{ getInitials(prof.nome) }}
+                    </div>
+                    <div style="flex:1">
+                        <div style="font-size:13px;font-weight:500">{{ prof.nome }}</div>
+                    </div>
+                    <div style="font-size:18px;font-weight:600" [style.color]="prof.cor">
+                        {{ prof.appointmentCount || 0 }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

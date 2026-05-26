@@ -1,0 +1,94 @@
+<app-header pageTitle="Administração" pageSubtitle="Controle geral do salão">
+</app-header>
+
+<div class="page-body">
+    <!-- Professionals Grid -->
+    <div class="section-title">Profissionais</div>
+    <div class="prof-grid">
+        <div *ngFor="let prof of profissionaisList" class="prof-card">
+            <div class="prof-avatar" [style.background]="prof.cor">
+                {{ getInitials(prof.nome) }}
+            </div>
+            <div class="prof-name">{{ prof.nome }}</div>
+            <div class="prof-role">{{ prof.cargo }}</div>
+            <div class="prof-services">{{ prof.servicos.join(' • ') }}</div>
+            <div class="prof-stats">
+                <div class="prof-stat">Hoje: {{ getTodayCount(prof.id) }}</div>
+                <div class="prof-stat">Total: {{ getTotalCount(prof.id) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commission Panel -->
+    <div class="section-title">Comissões</div>
+    <div class="commission-grid">
+        <div *ngFor="let prof of profissionaisList" class="commission-card">
+            <div class="commission-avatar" [style.background]="prof.cor">
+                {{ getInitials(prof.nome) }}
+            </div>
+            <div class="commission-name">{{ prof.nome }}</div>
+            <div class="commission-meta">Taxa: {{ prof.comissaoPercentual }}%</div>
+            <div class="commission-value">R$ {{ getTotalCommission(prof.id) | number:'1.2-2' }}</div>
+            <div class="commission-sub">Receita: R$ {{ getTotalRevenue(prof.id) | number:'1.2-2' }}</div>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">Todos os Agendamentos</div>
+            <select [(ngModel)]="filterProfId" (change)="onFilterChange()"
+                style="padding:6px 12px;border:1px solid var(--cinza-medio);border-radius:8px;font-size:13px;color:#3a2a2a;background:var(--cinza-claro);outline:none;font-family:'DM Sans',sans-serif">
+                <option value="">Todas as profissionais</option>
+                <option *ngFor="let prof of profissionaisList" value="{{ prof.id }}">
+                    {{ prof.nome }}
+                </option>
+            </select>
+        </div>
+        <div style="overflow-x:auto">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Profissional</th>
+                        <th>Serviço</th>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Valor</th>
+                        <th>Comissão</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let appt of agendamentos()">
+                        <td><strong>{{ appt.clienteNome }}</strong></td>
+                        <td>
+                            <span style="display:inline-flex;align-items:center;gap:6px">
+                                <span
+                                    style="width:8px;height:8px;border-radius:50%;background:{{ getProfissionalById(appt.profId)?.cor }};display:inline-block"></span>
+                                {{ getProfissionalById(appt.profId)?.nome }}
+                            </span>
+                        </td>
+                        <td>{{ appt.tipoServico }}</td>
+                        <td>{{ formatDate(appt.data) }}</td>
+                        <td>{{ appt.hora }}</td>
+                        <td>R$ {{ appt.valor | number:'1.2-2' }}</td>
+                        <td>R$ {{ getAppointmentCommission(appt) | number:'1.2-2' }}</td>
+                        <td>
+                            <span class="badge" [ngClass]="getStatusBadgeClass(appt.status)">
+                                {{ appt.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <button (click)="onEditAppointment(appt.id)"
+                                style="background:none;border:1px solid var(--cinza-medio);border-radius:6px;padding:4px 10px;font-size:11px;color:#6a4a4a;cursor:pointer;font-family:'DM Sans',sans-serif">
+                                Editar
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

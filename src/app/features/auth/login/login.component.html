@@ -1,0 +1,25 @@
+<div class="login-screen">
+    <div class="login-card">
+        <div class="login-logo">
+            <img src="assets/images/logo.png" alt="Brotas Beauty" class="logo-img" />
+            <h1>Brotas Beauty</h1>
+            <p>Sistema Interno</p>
+        </div>
+        <p class="login-subtitle">Acesso exclusivo para profissionais e administradora</p>
+        <div class="form-group">
+            <label>Usuário</label>
+            <input type="text" id="login-user" [(ngModel)]="username" (keyup)="onKeyUp($event, 'username')"
+                placeholder="Digite seu usuário" autocomplete="username" />
+        </div>
+        <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="login-pass" [(ngModel)]="password" (keyup)="onKeyUp($event, 'password')"
+                placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <button class="login-btn" (click)="onLogin()">Entrar</button>
+        <p class="login-error">{{ errorMessage() }}</p>
+        <p class="login-hint">
+            simone · elizeth · clau · kaylaine · admin (senha: 123 ou admin)
+        </p>
+    </div>
+</div>

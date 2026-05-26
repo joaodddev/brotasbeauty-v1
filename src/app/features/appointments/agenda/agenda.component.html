@@ -1,0 +1,65 @@
+<app-header pageTitle="Agenda" pageSubtitle="Gerenciamento de horários">
+</app-header>
+
+<div class="page-body">
+    <!-- Agenda Toolbar -->
+    <div class="agenda-toolbar">
+        <button class="agenda-nav-btn" (click)="changeMonth(-1)">← Anterior</button>
+        <div class="agenda-month">{{ monthLabel() }}</div>
+        <button class="agenda-nav-btn" (click)="changeMonth(1)">Próximo →</button>
+        <div class="filter-chips">
+            <div *ngFor="let chip of filterChips()" class="chip" [class.chip-active]="filterProf() === chip.id"
+                (click)="setFilter(chip.id)"
+                [style.borderColor]="chip.id !== 'all' ? getProfissionalById(chip.id)?.cor : ''"
+                [style.color]="chip.id !== 'all' ? getProfissionalById(chip.id)?.cor : ''">
+                {{ chip.nome }}
+            </div>
+        </div>
+    </div>
+
+    <!-- View Selector -->
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+        <button class="agenda-nav-btn" [style.background]="currentView() === 'cal' ? 'var(--marrom-rose)' : ''"
+            [style.color]="currentView() === 'cal' ? '#fff' : ''"
+            [style.borderColor]="currentView() === 'cal' ? 'var(--marrom-rose)' : ''" (click)="setView('cal')">
+            Mensal
+        </button>
+        <button class="agenda-nav-btn" [style.background]="currentView() === 'day' ? 'var(--marrom-rose)' : ''"
+            [style.color]="currentView() === 'day' ? '#fff' : ''"
+            [style.borderColor]="currentView() === 'day' ? 'var(--marrom-rose)' : ''" (click)="setView('day')">
+            Diária
+        </button>
+    </div>
+
+    <!-- Calendar View -->
+    <div *ngIf="currentView() === 'cal'">
+        <div class="calendar-grid">
+            <div class="cal-header">
+                <div class="cal-day-name">Dom</div>
+                <div class="cal-day-name">Seg</div>
+                <div class="cal-day-name">Ter</div>
+                <div class="cal-day-name">Qua</div>
+                <div class="cal-day-name">Qui</div>
+                <div class="cal-day-name">Sex</div>
+                <div class="cal-day-name">Sáb</div>
+            </div>
+            <div class="cal-body">
+                <div *ngFor="let day of calendarDays()" class="cal-cell" [class.other-month]="!day.isCurrentMonth"
+                    [class.today]="day.isToday" (click)="onCellClick(day.dateStr)">
+                    <div class="cal-date" [class.today]="day.isToday">{{ day.date.getDate() }}</div>
+                    <div class="cal-events">
+                        <div *ngFor="let appt of day.appointments.slice(0, 3)" class="cal-event"
+                            [style.background]="getProfissionalById(appt.profId)?.cor"
+                            (click)="onAppointmentClick(appt.id, $event)">
+                            {{ appt.hora }} {{ appt.clienteNome }}
+                        </div>
+                        <div *ngIf="getMoreCount(day.appointments) > 0"
+                            style="font-size:10px;color:#9a7a7a;padding:1px 4px">
+                            +{{ getMoreCount(day.appointments) }} mais
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

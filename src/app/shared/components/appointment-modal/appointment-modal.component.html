@@ -1,0 +1,88 @@
+<div class="modal-overlay" [class.hidden]="!modalState().isOpen">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-title">
+            {{ isEditing() ? 'Editar Agendamento' : 'Novo Agendamento' }}
+        </div>
+
+        <div class="modal-grid">
+            <!-- Client Name -->
+            <div class="modal-field full">
+                <label>Nome do cliente</label>
+                <input type="text" [(ngModel)]="clientName" placeholder="Nome completo do cliente" />
+            </div>
+
+            <!-- Professional -->
+            <div class="modal-field">
+                <label>Profissional</label>
+                <ng-container *ngIf="isAdminUser(); else onlyProf">
+                    <select [(ngModel)]="profId">
+                        <option *ngFor="let prof of profissionaisList" [value]="prof.id">{{ prof.nome }}</option>
+                    </select>
+                </ng-container>
+                <ng-template #onlyProf>
+                    <input type="text" [value]="getProfNameById(profId())" readonly />
+                </ng-template>
+            </div>
+
+            <!-- Service Type -->
+            <div class="modal-field">
+                <label>Tipo de serviço</label>
+                <select [(ngModel)]="tipoServico">
+                    <option *ngFor="let s of getServiceOptions()" [value]="s">{{ s }}</option>
+                </select>
+            </div>
+
+            <!-- Status -->
+            <div class="modal-field">
+                <label>Status</label>
+                <select [(ngModel)]="status">
+                    <option value="pendente">Pendente</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="finalizado">Finalizado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+            </div>
+
+            <!-- Date -->
+            <div class="modal-field">
+                <label>Data</label>
+                <input type="date" [(ngModel)]="date" />
+            </div>
+
+            <!-- Time -->
+            <div class="modal-field">
+                <label>Horário</label>
+                <input type="time" [(ngModel)]="time" />
+            </div>
+
+            <!-- Value -->
+            <div class="modal-field">
+                <label>Valor do serviço</label>
+                <input type="number" min="0" step="0.01" [(ngModel)]="valor" />
+            </div>
+
+            <!-- Commission -->
+            <div class="modal-field">
+                <label>Comissão estimada</label>
+                <div class="commission-value">R$ {{ getEstimatedCommission() | number:'1.2-2' }} ({{
+                    getCurrentCommissionRate() }}%)</div>
+            </div>
+
+            <!-- Observations -->
+            <div class="modal-field full">
+                <label>Observações</label>
+                <textarea [(ngModel)]="observations" placeholder="Serviços, informações adicionais...">
+        </textarea>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+            <button class="btn-danger" *ngIf="isEditing()" (click)="delete()">
+                Excluir
+            </button>
+            <button class="btn-primary" (click)="save()">Salvar</button>
+        </div>
+    </div>
+</div>

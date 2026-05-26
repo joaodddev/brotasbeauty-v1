@@ -1,1 +1,141 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --rosa-cha: #e8aebf;
+    --rosa-blush: #f6dce3;
+    --marrom-rose: #8c4a4a;
+    --dourado-rose: #c9a18b;
+    --branco: #ffffff;
+    --cinza-claro: #f9f5f6;
+    --cinza-medio: #e8d5d9;
+    --sombra: rgba(140, 74, 74, 0.1);
+    --verde: #4caf50;
+    --vermelho: #f44336;
+    --azul: #2196f3;
+    --roxo: #9c27b0;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cinza-claro);
+    color: #3a2a2a;
+    overflow-x: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--rosa-cha);
+    border-radius: 4px;
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--marrom-rose);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    z-index: 9999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(140, 74, 74, 0.3);
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Main App Layout */
+app-root {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--cinza-claro);
+}
+
+/* Utility Classes */
+.btn-primary {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--marrom-rose), var(--dourado-rose));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(140, 74, 74, 0.3);
+}
+
+.btn-secondary {
+    padding: 10px 20px;
+    background: #fff;
+    border: 1.5px solid var(--cinza-medio);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #6a4a4a;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: var(--cinza-claro);
+}
+
+.btn-danger {
+    padding: 10px 20px;
+    background: #fff;
+    border: 1.5px solid #f44336;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #f44336;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover {
+    background: #fce4ec;
+}
+
+@media (max-width: 700px) {
+    app-root {
+        flex-direction: column;
+    }
+}

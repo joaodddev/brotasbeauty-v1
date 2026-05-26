@@ -1,0 +1,10 @@
+:host {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+:host(app-root) {
+    display: flex;
+    height: 100vh;
+}
