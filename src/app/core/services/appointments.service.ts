@@ -12,7 +12,7 @@ export class AppointmentsService {
     private http = inject(HttpClient);
     private agendamentos = signal<Agendamento[]>([]);
     private idCounter = 0;
-    private readonly API_URL = 'http://localhost:4000/api';
+    private readonly API_URL = 'https://brotasbeauty-backend.onrender.com/api';
 
     constructor() {
         void this.loadData();
