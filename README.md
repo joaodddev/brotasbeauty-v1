@@ -3,6 +3,8 @@
 ![Angular](https://img.shields.io/badge/Angular-17-red)
 ![TypeScript](https://img.shields.io/badge/TypeScript-blue)
 ![Vercel](https://img.shields.io/badge/Deploy-Vercel-black)
+---
+
 Sistema interno de gerenciamento para salão de beleza, desenvolvido com Angular.
 
 Projeto criado para controle de:
